@@ -67,6 +67,36 @@ function App() {
     }
   };
 
+  const fetchRevenueStats = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/revenue/stats`);
+      const data = await response.json();
+      setRevenueStats(data);
+    } catch (error) {
+      console.error('Error fetching revenue stats:', error);
+    }
+  };
+
+  const fetchRevenueOpportunities = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/revenue/opportunities`);
+      const data = await response.json();
+      setRevenueOpportunities(data);
+    } catch (error) {
+      console.error('Error fetching revenue opportunities:', error);
+    }
+  };
+
+  const fetchNextActions = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/revenue/next-actions`);
+      const data = await response.json();
+      setNextActions(data);
+    } catch (error) {
+      console.error('Error fetching next actions:', error);
+    }
+  };
+
   const refreshTrends = async () => {
     try {
       await fetch(`${API_BASE_URL}/api/trends/refresh`);

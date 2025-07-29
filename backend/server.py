@@ -608,6 +608,73 @@ async def get_agent_logs():
     logs = await agent_logs_collection.find().sort("timestamp", -1).limit(100).to_list(100)
     return convert_mongo_doc(logs)
 
+@app.get("/api/revenue/opportunities")
+async def get_template_opportunities():
+    opportunities = await db.template_opportunities.find().sort("profit_potential", -1).limit(20).to_list(20)
+    return convert_mongo_doc(opportunities)
+
+@app.post("/api/revenue/create-template-workflow")
+async def create_template_workflow_endpoint(opportunity_data: dict):
+    try:
+        workflow = await create_template_workflow(opportunity_data)
+        return {"message": "Template workflow created", "workflow_id": workflow["id"], "revenue_target": workflow["estimated_revenue"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/revenue/stats")
+async def get_revenue_stats():
+    # Calculate revenue statistics
+    revenue_workflows = await workflows_collection.find({"category": "digital_templates"}).to_list(None)
+    
+    total_revenue_target = sum(w.get('estimated_revenue', 0) for w in revenue_workflows)
+    completed_revenue_workflows = [w for w in revenue_workflows if w.get('status') == 'completed']
+    potential_earned = sum(w.get('estimated_revenue', 0) for w in completed_revenue_workflows)
+    
+    active_revenue_workflows = len([w for w in revenue_workflows if w.get('status') == 'running'])
+    pending_revenue_workflows = len([w for w in revenue_workflows if w.get('status') == 'pending'])
+    
+    # Calculate today's opportunities
+    today = datetime.now().date()
+    today_opportunities = await db.template_opportunities.count_documents({
+        "created_at": {"$gte": datetime.combine(today, datetime.min.time())}
+    })
+    
+    return {
+        "total_revenue_target": total_revenue_target,
+        "potential_earned": potential_earned,
+        "active_revenue_workflows": active_revenue_workflows,
+        "pending_revenue_workflows": pending_revenue_workflows,
+        "opportunities_today": today_opportunities,
+        "revenue_workflows_completed": len(completed_revenue_workflows),
+        "average_template_price": total_revenue_target / len(revenue_workflows) if revenue_workflows else 0
+    }
+
+@app.get("/api/revenue/next-actions")
+async def get_next_revenue_actions():
+    """Get the next actions needed to complete revenue workflows"""
+    running_workflows = await workflows_collection.find({
+        "status": "running", 
+        "category": "digital_templates"
+    }).to_list(None)
+    
+    next_actions = []
+    for workflow in running_workflows:
+        current_step_index = workflow.get('current_step', 0)
+        if current_step_index < len(workflow.get('steps', [])):
+            current_step = workflow['steps'][current_step_index]
+            next_actions.append({
+                "workflow_id": workflow['id'],
+                "workflow_name": workflow['name'],
+                "next_step": current_step['name'],
+                "description": current_step['description'],
+                "tools": current_step.get('tools', []),
+                "estimated_time": current_step.get('estimated_time', 0),
+                "revenue_target": workflow.get('estimated_revenue', 0),
+                "progress": workflow.get('progress', 0)
+            })
+    
+    return convert_mongo_doc(next_actions)
+
 @app.get("/api/dashboard/stats")
 async def get_dashboard_stats():
     total_workflows = await workflows_collection.count_documents({})
@@ -616,12 +683,20 @@ async def get_dashboard_stats():
     total_trends = await trends_collection.count_documents({})
     total_products = await products_collection.count_documents({})
     
-    # Calculate profitability
+    # Calculate profitability including revenue workflows
     pipeline = [
         {"$group": {"_id": None, "total_profit": {"$sum": "$actual_profitability"}}}
     ]
     profit_result = await workflows_collection.aggregate(pipeline).to_list(1)
     total_profit = profit_result[0]["total_profit"] if profit_result else 0.0
+    
+    # Add revenue potential from template workflows
+    revenue_potential_pipeline = [
+        {"$match": {"category": "digital_templates", "status": "completed"}},
+        {"$group": {"_id": None, "revenue_potential": {"$sum": "$estimated_revenue"}}}
+    ]
+    revenue_result = await workflows_collection.aggregate(revenue_potential_pipeline).to_list(1)
+    revenue_potential = revenue_result[0]["revenue_potential"] if revenue_result else 0.0
     
     return {
         "total_workflows": total_workflows,
@@ -630,6 +705,7 @@ async def get_dashboard_stats():
         "total_trends": total_trends,
         "total_products": total_products,
         "total_profit": total_profit,
+        "revenue_potential": revenue_potential,
         "agent_status": agent_state["status"]
     }
 

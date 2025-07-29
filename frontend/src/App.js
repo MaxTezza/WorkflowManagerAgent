@@ -9,6 +9,9 @@ function App() {
   const [trends, setTrends] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [agentLogs, setAgentLogs] = useState([]);
+  const [revenueStats, setRevenueStats] = useState(null);
+  const [revenueOpportunities, setRevenueOpportunities] = useState([]);
+  const [nextActions, setNextActions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showCreateWorkflow, setShowCreateWorkflow] = useState(false);
   const [loading, setLoading] = useState(true);

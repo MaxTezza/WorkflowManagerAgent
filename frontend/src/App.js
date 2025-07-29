@@ -190,29 +190,81 @@ function App() {
     </div>
   );
 
-  const TrendCard = ({ trend }) => (
-    <div className="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-green-500">
-      <h4 className="font-semibold text-gray-800 mb-2">{trend.keyword}</h4>
-      <div className="grid grid-cols-2 gap-2 text-sm">
+  const RevenueOpportunityCard = ({ opportunity }) => (
+    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-green-500">
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="text-lg font-semibold text-gray-800">{opportunity.template_type}</h3>
+        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+          ${opportunity.estimated_price}
+        </span>
+      </div>
+      <p className="text-sm text-gray-600 mb-3">Based on trending: {opportunity.trending_keyword}</p>
+      <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <span className="text-gray-500">Score:</span>
-          <span className="ml-2 font-medium">{trend.trend_score?.toFixed(2)}</span>
+          <span className="text-gray-500">Difficulty:</span>
+          <span className="ml-2 font-medium">{opportunity.difficulty}</span>
         </div>
         <div>
-          <span className="text-gray-500">Volume:</span>
-          <span className="ml-2 font-medium">{trend.volume}</span>
+          <span className="text-gray-500">Time:</span>
+          <span className="ml-2 font-medium">{opportunity.time_to_create}</span>
         </div>
       </div>
-      <div className="mt-2">
-        <span className="text-gray-500 text-sm">Opportunities:</span>
+      <div className="mt-3">
+        <span className="text-gray-500 text-sm">Platforms:</span>
         <div className="flex flex-wrap gap-1 mt-1">
-          {trend.product_opportunities?.map((opp, idx) => (
-            <span key={idx} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-              {opp}
+          {opportunity.platforms?.map((platform, idx) => (
+            <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+              {platform}
             </span>
           ))}
         </div>
       </div>
+      <div className="mt-3 pt-3 border-t">
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-500">Profit Potential:</span>
+          <span className="font-bold text-green-600">${opportunity.profit_potential?.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const NextActionCard = ({ action }) => (
+    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-l-yellow-500">
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="text-lg font-semibold text-gray-800">{action.next_step}</h3>
+        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+          {action.estimated_time} min
+        </span>
+      </div>
+      <p className="text-sm text-gray-600 mb-3">{action.description}</p>
+      <div className="mb-3">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-sm text-gray-500">Progress</span>
+          <span className="text-sm font-medium">{action.progress}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-yellow-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${action.progress}%` }}
+          ></div>
+        </div>
+      </div>
+      <div className="text-sm">
+        <span className="text-gray-500">Revenue Target:</span>
+        <span className="ml-2 font-bold text-green-600">${action.revenue_target}</span>
+      </div>
+      {action.tools && action.tools.length > 0 && (
+        <div className="mt-3">
+          <span className="text-gray-500 text-sm">Tools needed:</span>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {action.tools.map((tool, idx) => (
+              <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
+                {tool}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 

@@ -338,7 +338,7 @@ async def get_agent_status():
 @app.get("/api/workflows")
 async def get_workflows():
     workflows = await workflows_collection.find().sort("created_at", -1).to_list(100)
-    return workflows
+    return convert_mongo_doc(workflows)
 
 @app.post("/api/workflows")
 async def create_workflow(workflow: WorkflowCreate):
@@ -368,7 +368,7 @@ async def get_workflow(workflow_id: str):
     workflow = await workflows_collection.find_one({"id": workflow_id})
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    return workflow
+    return convert_mongo_doc(workflow)
 
 @app.put("/api/workflows/{workflow_id}/status")
 async def update_workflow_status(workflow_id: str, status: str):
@@ -383,22 +383,22 @@ async def update_workflow_status(workflow_id: str, status: str):
 @app.get("/api/trends")
 async def get_trends():
     trends = await trends_collection.find().sort("detected_at", -1).limit(50).to_list(50)
-    return trends
+    return convert_mongo_doc(trends)
 
 @app.get("/api/trends/refresh")
 async def refresh_trends():
     trends = await scrape_reddit_trends()
-    return {"message": f"Found {len(trends)} new trends"}
+    return {"message": f"Found {len(trends)} new trends", "trends": convert_mongo_doc(trends)}
 
 @app.get("/api/products")
 async def get_products():
     products = await products_collection.find().sort("created_at", -1).to_list(100)
-    return products
+    return convert_mongo_doc(products)
 
 @app.get("/api/agent/logs")
 async def get_agent_logs():
     logs = await agent_logs_collection.find().sort("timestamp", -1).limit(100).to_list(100)
-    return logs
+    return convert_mongo_doc(logs)
 
 @app.get("/api/dashboard/stats")
 async def get_dashboard_stats():

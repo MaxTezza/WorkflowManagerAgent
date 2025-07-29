@@ -549,6 +549,7 @@ async def create_workflow(workflow: WorkflowCreate):
         "name": workflow.name,
         "description": workflow.description,
         "type": workflow.type,
+        "category": "digital_templates" if workflow.type == "revenue_generation" else "general",
         "steps": workflow.steps,
         "status": "pending",
         "priority": workflow.priority,
@@ -559,7 +560,8 @@ async def create_workflow(workflow: WorkflowCreate):
         "completed_at": None,
         "progress": 0,
         "current_step": 0,
-        "results": {}
+        "results": {},
+        "estimated_revenue": workflow.target_profitability / 0.9 if workflow.type == "revenue_generation" else 0.0
     }
     
     await workflows_collection.insert_one(workflow_data)

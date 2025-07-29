@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import os
@@ -39,6 +40,27 @@ trends_collection = db.trends
 products_collection = db.products
 agent_logs_collection = db.agent_logs
 settings_collection = db.settings
+
+# Helper function to convert MongoDB documents
+def convert_mongo_doc(doc):
+    """Convert MongoDB document to JSON serializable format"""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [convert_mongo_doc(item) for item in doc]
+    if isinstance(doc, dict):
+        # Remove MongoDB _id field and convert any remaining ObjectId fields
+        result = {}
+        for key, value in doc.items():
+            if key == '_id':
+                continue  # Skip MongoDB _id
+            elif hasattr(value, '__dict__'):
+                # Skip complex objects that can't be serialized
+                continue
+            else:
+                result[key] = convert_mongo_doc(value)
+        return result
+    return doc
 
 # Pydantic models
 class WorkflowCreate(BaseModel):

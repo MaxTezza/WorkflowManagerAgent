@@ -90,6 +90,44 @@ function App() {
     }
   };
 
+  const fetchStrategyPlan = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/strategy/zero-dollar-plan`);
+      const data = await response.json();
+      setStrategyPlan(data);
+    } catch (error) {
+      console.error('Error fetching strategy plan:', error);
+    }
+  };
+
+  const fetchStrategyStatus = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/strategy/current-status`);
+      const data = await response.json();
+      setStrategyStatus(data);
+    } catch (error) {
+      console.error('Error fetching strategy status:', error);
+    }
+  };
+
+  const executePhase = async (phase) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/strategy/execute-phase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phase })
+      });
+      
+      if (response.ok) {
+        await fetchWorkflows();
+        await fetchStrategyStatus();
+        await fetchRevenueStats();
+      }
+    } catch (error) {
+      console.error('Error executing phase:', error);
+    }
+  };
+
   const fetchNextActions = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/revenue/next-actions`);

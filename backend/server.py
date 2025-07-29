@@ -389,15 +389,37 @@ async def execute_workflow_step(workflow_id: str, step_index: int):
         logger.error(f"Error executing workflow step: {e}")
         return False
 
+# Enhanced agent decision engine for revenue generation
 async def agent_decision_engine():
-    """AI Agent decision making engine"""
+    """AI Agent decision making engine focused on revenue generation"""
     while True:
         try:
             agent_state["status"] = "thinking"
             agent_state["last_activity"] = datetime.now()
             
+            # Check for template opportunities every hour
+            current_hour = datetime.now().hour
+            if current_hour != getattr(agent_decision_engine, 'last_opportunity_check', -1):
+                agent_state["current_task"] = "Analyzing template opportunities"
+                opportunities = await analyze_template_opportunities()
+                
+                if opportunities:
+                    # Create workflows for top 3 opportunities
+                    for opportunity in opportunities[:3]:
+                        await create_template_workflow(opportunity)
+                        await agent_logs_collection.insert_one({
+                            "id": str(uuid.uuid4()),
+                            "timestamp": datetime.now(),
+                            "action": f"Created revenue workflow: {opportunity['template_type']}",
+                            "reasoning": f"High profit potential ${opportunity['estimated_price']} based on trending: {opportunity['trending_keyword']}",
+                            "revenue_potential": opportunity['estimated_price'],
+                            "template_type": opportunity['template_type']
+                        })
+                
+                agent_decision_engine.last_opportunity_check = current_hour
+            
             # Check for pending workflows
-            pending_workflows = await workflows_collection.find({"status": "pending"}).sort("priority", -1).to_list(None)
+            pending_workflows = await workflows_collection.find({"status": "pending"}).sort([("priority", -1), ("estimated_revenue", -1)]).to_list(None)
             
             # Check for running workflows that need next step
             running_workflows = await workflows_collection.find({"status": "running"}).to_list(None)
@@ -405,7 +427,7 @@ async def agent_decision_engine():
             for workflow in running_workflows:
                 if workflow['current_step'] < len(workflow['steps']):
                     agent_state["status"] = "executing"
-                    agent_state["current_task"] = f"Executing {workflow['name']}"
+                    agent_state["current_task"] = f"Working on {workflow['name']}"
                     
                     success = await execute_workflow_step(workflow['id'], workflow['current_step'])
                     if success:
@@ -424,10 +446,22 @@ async def agent_decision_engine():
                                 }
                             )
                             agent_state["completed_today"] += 1
+                            
+                            # Log revenue workflow completion
+                            if workflow.get('category') == 'digital_templates':
+                                await agent_logs_collection.insert_one({
+                                    "id": str(uuid.uuid4()),
+                                    "timestamp": datetime.now(),
+                                    "action": f"Revenue workflow completed: {workflow['name']}",
+                                    "reasoning": "Template ready for marketplace listing",
+                                    "next_action": "List on Etsy, Gumroad, Creative Market",
+                                    "revenue_potential": workflow.get('estimated_revenue', 0)
+                                })
             
-            # Start new workflows if capacity allows
-            if len(running_workflows) < 3 and pending_workflows:  # Max 3 concurrent workflows
-                workflow = pending_workflows[0]
+            # Start new revenue-focused workflows first (priority 4)
+            revenue_workflows = [w for w in pending_workflows if w.get('priority', 0) >= 4]
+            if len(running_workflows) < 2 and revenue_workflows:  # Max 2 concurrent for focus
+                workflow = revenue_workflows[0]
                 await workflows_collection.update_one(
                     {"id": workflow['id']},
                     {
@@ -439,17 +473,34 @@ async def agent_decision_engine():
                 )
                 agent_state["active_workflows"] += 1
                 
-                # Log decision
+                # Log decision with revenue focus
                 await agent_logs_collection.insert_one({
                     "id": str(uuid.uuid4()),
                     "timestamp": datetime.now(),
-                    "action": f"Started workflow: {workflow['name']}",
-                    "reasoning": f"High priority ({workflow['priority']}) and capacity available",
-                    "workflow_id": workflow['id']
+                    "action": f"Started revenue workflow: {workflow['name']}",
+                    "reasoning": f"Revenue priority - Target: ${workflow.get('estimated_revenue', 0)}, ROI: ${workflow.get('roi_per_hour', 0):.2f}/hour",
+                    "workflow_id": workflow['id'],
+                    "revenue_target": workflow.get('estimated_revenue', 0)
                 })
             
+            # Then start other workflows if capacity allows
+            elif len(running_workflows) < 3 and pending_workflows:
+                other_workflows = [w for w in pending_workflows if w.get('priority', 0) < 4]
+                if other_workflows:
+                    workflow = other_workflows[0]
+                    await workflows_collection.update_one(
+                        {"id": workflow['id']},
+                        {
+                            "$set": {
+                                "status": "running",
+                                "started_at": datetime.now()
+                            }
+                        }
+                    )
+                    agent_state["active_workflows"] += 1
+            
             agent_state["status"] = "idle"
-            await asyncio.sleep(5)  # Check every 5 seconds
+            await asyncio.sleep(3)  # Check every 3 seconds for faster revenue response
             
         except Exception as e:
             logger.error(f"Agent decision engine error: {e}")

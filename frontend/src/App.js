@@ -115,7 +115,10 @@ function App() {
         fetchWorkflows(),
         fetchTrends(),
         fetchDashboardStats(),
-        fetchAgentLogs()
+        fetchAgentLogs(),
+        fetchRevenueStats(),
+        fetchRevenueOpportunities(),
+        fetchNextActions()
       ]);
       setLoading(false);
     };
@@ -128,6 +131,8 @@ function App() {
       fetchWorkflows();
       fetchDashboardStats();
       fetchAgentLogs();
+      fetchRevenueStats();
+      fetchNextActions();
     }, 5000);
 
     return () => clearInterval(interval);

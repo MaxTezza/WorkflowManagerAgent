@@ -130,6 +130,157 @@ agent_state = {
 }
 
 # Trend detection functions
+# Revenue Generation Functions
+async def analyze_template_opportunities():
+    """Analyze trending topics for profitable template opportunities"""
+    try:
+        # Get recent trends
+        recent_trends = await trends_collection.find().sort("detected_at", -1).limit(20).to_list(20)
+        
+        template_opportunities = []
+        for trend in recent_trends:
+            keyword = trend.get('keyword', '').lower()
+            
+            # High-value template categories
+            template_types = []
+            if any(word in keyword for word in ['business', 'startup', 'entrepreneur', 'plan']):
+                template_types.extend(['Business Plan Template', 'Pitch Deck Template', 'Financial Tracker'])
+            if any(word in keyword for word in ['social media', 'instagram', 'content', 'marketing']):
+                template_types.extend(['Social Media Templates', 'Content Calendar', 'Instagram Story Templates'])
+            if any(word in keyword for word in ['productivity', 'planner', 'organize', 'schedule']):
+                template_types.extend(['Productivity Planner', 'Goal Tracker', 'Daily Schedule Template'])
+            if any(word in keyword for word in ['resume', 'cv', 'job', 'career']):
+                template_types.extend(['Resume Template', 'Cover Letter Template', 'Portfolio Template'])
+            if any(word in keyword for word in ['wedding', 'event', 'party', 'celebration']):
+                template_types.extend(['Wedding Planner', 'Event Timeline', 'Invitation Template'])
+            
+            if template_types:
+                for template_type in template_types:
+                    opportunity = {
+                        "id": str(uuid.uuid4()),
+                        "template_type": template_type,
+                        "trending_keyword": trend.get('keyword', ''),
+                        "market_demand": trend.get('trend_score', 0),
+                        "estimated_price": calculate_template_price(template_type),
+                        "difficulty": "Easy" if any(word in template_type.lower() for word in ['planner', 'tracker', 'calendar']) else "Medium",
+                        "time_to_create": "2-4 hours",
+                        "platforms": ["Etsy", "Gumroad", "Creative Market"],
+                        "profit_potential": trend.get('profitability_potential', 0) * calculate_template_price(template_type),
+                        "created_at": datetime.now(),
+                        "status": "opportunity_identified"
+                    }
+                    template_opportunities.append(opportunity)
+        
+        # Save to database
+        if template_opportunities:
+            await db.template_opportunities.insert_many(template_opportunities)
+            
+        return template_opportunities[:10]  # Return top 10 opportunities
+        
+    except Exception as e:
+        logger.error(f"Error analyzing template opportunities: {e}")
+        return []
+
+def calculate_template_price(template_type):
+    """Calculate estimated selling price for template types"""
+    pricing_map = {
+        'Business Plan Template': 25,
+        'Pitch Deck Template': 35,
+        'Financial Tracker': 15,
+        'Social Media Templates': 20,
+        'Content Calendar': 18,
+        'Instagram Story Templates': 12,
+        'Productivity Planner': 22,
+        'Goal Tracker': 16,
+        'Daily Schedule Template': 14,
+        'Resume Template': 8,
+        'Cover Letter Template': 6,
+        'Portfolio Template': 28,
+        'Wedding Planner': 45,
+        'Event Timeline': 25,
+        'Invitation Template': 15
+    }
+    return pricing_map.get(template_type, 20)
+
+async def create_template_workflow(opportunity):
+    """Create a workflow to produce a digital template"""
+    workflow_steps = [
+        {
+            "type": "market_research",
+            "name": f"Research {opportunity['template_type']} market",
+            "description": f"Analyze competitor pricing and features for {opportunity['template_type']}",
+            "tools": ["Etsy search", "Google Trends", "Pinterest research"],
+            "estimated_time": 30,
+            "status": "pending"
+        },
+        {
+            "type": "design_planning", 
+            "name": "Plan template design",
+            "description": f"Create design brief and layout plan for {opportunity['template_type']}",
+            "tools": ["Canva (free)", "GIMP", "Paper sketching"],
+            "estimated_time": 45,
+            "status": "pending"
+        },
+        {
+            "type": "template_creation",
+            "name": "Create template",
+            "description": f"Design and build the {opportunity['template_type']} using free tools",
+            "tools": ["Canva", "Google Docs/Sheets", "GIMP"],
+            "estimated_time": 180,  # 3 hours
+            "status": "pending"
+        },
+        {
+            "type": "quality_check",
+            "name": "Review and refine",
+            "description": "Check template quality, usability, and market fit",
+            "tools": ["Manual review", "Test with sample data"],
+            "estimated_time": 30,
+            "status": "pending"
+        },
+        {
+            "type": "listing_creation",
+            "name": "Create marketplace listings",
+            "description": f"Write descriptions, create previews, set pricing for {opportunity['template_type']}",
+            "tools": ["Etsy", "Gumroad", "Creative Market"],
+            "estimated_time": 60,
+            "status": "pending"
+        },
+        {
+            "type": "revenue_tracking",
+            "name": "Monitor sales performance",
+            "description": "Track sales, customer feedback, and optimize pricing",
+            "tools": ["Platform analytics", "Revenue tracking"],
+            "estimated_time": 15,
+            "status": "pending"
+        }
+    ]
+    
+    workflow_data = {
+        "id": str(uuid.uuid4()),
+        "name": f"Create {opportunity['template_type']} - Revenue Target: ${opportunity['estimated_price']}",
+        "description": f"Complete workflow to create and sell {opportunity['template_type']} based on trending keyword: {opportunity['trending_keyword']}",
+        "type": "revenue_generation",
+        "category": "digital_templates",
+        "steps": workflow_steps,
+        "status": "pending",
+        "priority": 4,  # High priority for revenue generation
+        "target_profitability": opportunity['estimated_price'] * 0.9,  # 90% profit margin
+        "actual_profitability": 0.0,
+        "created_at": datetime.now(),
+        "started_at": None,
+        "completed_at": None,
+        "progress": 0,
+        "current_step": 0,
+        "results": {},
+        "opportunity_id": opportunity['id'],
+        "estimated_revenue": opportunity['estimated_price'],
+        "time_investment": sum(step['estimated_time'] for step in workflow_steps),
+        "roi_per_hour": opportunity['estimated_price'] * 0.9 / (sum(step['estimated_time'] for step in workflow_steps) / 60)
+    }
+    
+    await workflows_collection.insert_one(workflow_data)
+    return workflow_data
+
 async def scrape_reddit_trends():
     """Scrape trending topics from Reddit"""
     try:

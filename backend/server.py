@@ -387,8 +387,14 @@ async def get_trends():
 
 @app.get("/api/trends/refresh")
 async def refresh_trends():
-    trends = await scrape_reddit_trends()
-    return {"message": f"Found {len(trends)} new trends", "trends": convert_mongo_doc(trends)}
+    try:
+        trends = await scrape_reddit_trends()
+        if trends is None:
+            trends = []
+        return {"message": f"Found {len(trends)} new trends", "trends": convert_mongo_doc(trends)}
+    except Exception as e:
+        logger.error(f"Error refreshing trends: {e}")
+        return {"message": "Error refreshing trends", "error": str(e), "trends": []}
 
 @app.get("/api/products")
 async def get_products():

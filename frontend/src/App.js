@@ -660,6 +660,202 @@ function App() {
           </div>
         )}
 
+        {activeTab === 'strategy' && (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-8">
+              <h2 className="text-3xl font-bold mb-4">🎯 Zero Dollar Digital Empire Strategy</h2>
+              <p className="text-xl mb-4">Generate $500-2000/month with ZERO investment - AI Agent executes everything!</p>
+              
+              {strategyStatus && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <div className="bg-white/20 rounded-lg p-4">
+                    <p className="text-2xl font-bold">{strategyStatus.total_strategy_workflows}</p>
+                    <p className="text-sm">Total Workflows</p>
+                  </div>
+                  <div className="bg-white/20 rounded-lg p-4">
+                    <p className="text-2xl font-bold">{strategyStatus.total_completed}</p>
+                    <p className="text-sm">Completed</p>
+                  </div>
+                  <div className="bg-white/20 rounded-lg p-4">
+                    <p className="text-2xl font-bold">${strategyStatus.total_revenue_generated}</p>
+                    <p className="text-sm">Revenue Generated</p>
+                  </div>
+                  <div className="bg-white/20 rounded-lg p-4">
+                    <p className="text-2xl font-bold">24-48h</p>
+                    <p className="text-sm">To First Sale</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Strategy Phases */}
+            {strategyPlan && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Phase 1 */}
+                <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-l-green-500">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-green-700">Phase 1: Immediate</h3>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {strategyStatus?.phases_status?.phase_1_immediate?.completion_rate || 0}% Complete
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3 mb-4">
+                    <p><strong>Timeline:</strong> {strategyPlan.phase_1_immediate.timeline}</p>
+                    <p><strong>Revenue Target:</strong> {strategyPlan.phase_1_immediate.revenue_target}</p>
+                    <p><strong>Investment:</strong> $0</p>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <h4 className="font-semibold">Actions:</h4>
+                    {strategyPlan.phase_1_immediate.actions.map((action, idx) => (
+                      <div key={idx} className="bg-gray-50 p-3 rounded">
+                        <p className="font-medium">{action.action}</p>
+                        <p className="text-sm text-gray-600">Tool: {action.tool}</p>
+                        <p className="text-sm text-gray-600">Revenue: {action.revenue}</p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    onClick={() => executePhase('phase_1_immediate')}
+                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 font-medium"
+                  >
+                    🚀 Execute Phase 1
+                  </button>
+                </div>
+
+                {/* Phase 2 */}
+                <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-l-blue-500">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-blue-700">Phase 2: Scale</h3>
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {strategyStatus?.phases_status?.phase_2_scale?.completion_rate || 0}% Complete
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3 mb-4">
+                    <p><strong>Timeline:</strong> {strategyPlan.phase_2_scale.timeline}</p>
+                    <p><strong>Revenue Target:</strong> {strategyPlan.phase_2_scale.revenue_target}</p>
+                    <p><strong>Focus:</strong> High-value templates</p>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <h4 className="font-semibold">Actions:</h4>
+                    {strategyPlan.phase_2_scale.actions.map((action, idx) => (
+                      <div key={idx} className="bg-gray-50 p-3 rounded">
+                        <p className="font-medium">{action.action}</p>
+                        <p className="text-sm text-gray-600">Tool: {action.tool}</p>
+                        <p className="text-sm text-gray-600">Revenue: {action.revenue}</p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    onClick={() => executePhase('phase_2_scale')}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-medium"
+                  >
+                    📈 Execute Phase 2
+                  </button>
+                </div>
+
+                {/* Phase 3 */}
+                <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-l-purple-500">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-purple-700">Phase 3: Automate</h3>
+                    <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {strategyStatus?.phases_status?.phase_3_automate?.completion_rate || 0}% Complete
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3 mb-4">
+                    <p><strong>Timeline:</strong> {strategyPlan.phase_3_automate.timeline}</p>
+                    <p><strong>Revenue Target:</strong> {strategyPlan.phase_3_automate.revenue_target}</p>
+                    <p><strong>Focus:</strong> Scaling & automation</p>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <h4 className="font-semibold">Actions:</h4>
+                    {strategyPlan.phase_3_automate.actions.map((action, idx) => (
+                      <div key={idx} className="bg-gray-50 p-3 rounded">
+                        <p className="font-medium">{action.action}</p>
+                        <p className="text-sm text-gray-600">Revenue: {action.revenue}</p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    onClick={() => executePhase('phase_3_automate')}
+                    className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 font-medium"
+                  >
+                    🚀 Execute Phase 3
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tools & Resources */}
+            {strategyPlan && (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-bold mb-4">🛠️ Free Tools Stack (Zero Investment)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-blue-600 mb-2">Design Tools</h4>
+                    <ul className="space-y-1 text-sm">
+                      {strategyPlan.tools_stack.design.map((tool, idx) => (
+                        <li key={idx}>• {tool}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-green-600 mb-2">Document Tools</h4>
+                    <ul className="space-y-1 text-sm">
+                      {strategyPlan.tools_stack.documents.map((tool, idx) => (
+                        <li key={idx}>• {tool}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-purple-600 mb-2">Marketplaces</h4>
+                    <ul className="space-y-1 text-sm">
+                      {strategyPlan.tools_stack.marketplaces.map((tool, idx) => (
+                        <li key={idx}>• {tool}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-red-600 mb-2">Marketing</h4>
+                    <ul className="space-y-1 text-sm">
+                      {strategyPlan.tools_stack.marketing.map((tool, idx) => (
+                        <li key={idx}>• {tool}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Success Metrics */}
+            {strategyPlan && (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-xl font-bold mb-4">📊 Success Metrics & Timeline</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {Object.entries(strategyPlan.success_metrics).map(([period, metrics]) => (
+                    <div key={period} className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-2 capitalize">{period.replace('_', ' ')}</h4>
+                      <div className="space-y-1 text-sm">
+                        <p>Templates: {metrics.templates_created}</p>
+                        <p>Listings: {metrics.listings_published}</p>
+                        <p className="font-semibold text-green-600">Sales: {metrics.target_sales}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'revenue' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">

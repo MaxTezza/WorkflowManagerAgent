@@ -454,7 +454,7 @@ function App() {
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center">
                   <div className="p-3 rounded-full bg-blue-100">
@@ -505,12 +505,66 @@ function App() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Profit</p>
-                    <p className="text-2xl font-semibold text-gray-900">${dashboardStats?.total_profit?.toFixed(2) || '0.00'}</p>
+                    <p className="text-sm font-medium text-gray-600">Revenue Potential</p>
+                    <p className="text-2xl font-semibold text-green-600">${dashboardStats?.revenue_potential?.toFixed(2) || '0.00'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-full bg-red-100">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Next Actions</p>
+                    <p className="text-2xl font-semibold text-red-600">{nextActions?.length || 0}</p>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Revenue Section */}
+            {revenueStats && (
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">💰 Revenue Generation Status</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-green-600">${revenueStats.total_revenue_target?.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Target Revenue</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-blue-600">{revenueStats.active_revenue_workflows}</p>
+                    <p className="text-sm text-gray-600">Active Revenue Workflows</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-purple-600">{revenueStats.opportunities_today}</p>
+                    <p className="text-sm text-gray-600">Opportunities Today</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-yellow-600">${revenueStats.average_template_price?.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Avg Template Price</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Next Actions Section */}
+            {nextActions && nextActions.length > 0 && (
+              <div className="bg-white rounded-lg shadow">
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold text-red-600">🚨 Action Required - Revenue Workflows</h3>
+                  <p className="text-sm text-gray-600 mt-1">Complete these steps to generate revenue</p>
+                </div>
+                <div className="p-6 space-y-4">
+                  {nextActions.slice(0, 3).map((action, idx) => (
+                    <NextActionCard key={idx} action={action} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -526,19 +580,16 @@ function App() {
               </div>
 
               <div className="bg-white rounded-lg shadow">
-                <div className="p-6 border-b flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Latest Trends</h3>
-                  <button
-                    onClick={refreshTrends}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    Refresh
-                  </button>
+                <div className="p-6 border-b">
+                  <h3 className="text-lg font-semibold">Revenue Opportunities</h3>
                 </div>
                 <div className="p-6 space-y-4">
-                  {trends.slice(0, 3).map((trend, idx) => (
-                    <TrendCard key={idx} trend={trend} />
+                  {revenueOpportunities.slice(0, 3).map((opportunity, idx) => (
+                    <RevenueOpportunityCard key={idx} opportunity={opportunity} />
                   ))}
+                  {revenueOpportunities.length === 0 && (
+                    <p className="text-gray-500 text-center py-4">Agent is analyzing trends for revenue opportunities...</p>
+                  )}
                 </div>
               </div>
             </div>

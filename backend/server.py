@@ -1261,6 +1261,25 @@ async def execute_strategy_phase(phase_data: dict):
         workflows_created = []
         
         for action in phase_info.get('actions', []):
+            # Parse revenue safely
+            revenue_str = action.get('revenue', '$25')
+            if 'sales potential' in revenue_str.lower() or 'immediate' in revenue_str.lower():
+                estimated_revenue = 20  # Default for immediate sales potential
+                target_profit = 18
+            else:
+                # Extract numbers from revenue string like "$15-25" or "$20"
+                import re
+                numbers = re.findall(r'\d+', revenue_str)
+                if len(numbers) >= 2:
+                    estimated_revenue = int(numbers[1])  # Use higher number
+                    target_profit = int(numbers[0]) * 0.9
+                elif len(numbers) == 1:
+                    estimated_revenue = int(numbers[0])
+                    target_profit = estimated_revenue * 0.9
+                else:
+                    estimated_revenue = 25
+                    target_profit = 22.5
+            
             workflow_data = {
                 "id": str(uuid.uuid4()),
                 "name": f"💰 {action['action']} - ${action['revenue']} Target",
@@ -1289,7 +1308,7 @@ async def execute_strategy_phase(phase_data: dict):
                 ],
                 "status": "pending",
                 "priority": 4,
-                "target_profitability": float(action['revenue'].split('-')[0].replace('$', '')) * 0.9,
+                "target_profitability": target_profit,
                 "actual_profitability": 0.0,
                 "created_at": datetime.now(),
                 "started_at": None,
@@ -1297,7 +1316,7 @@ async def execute_strategy_phase(phase_data: dict):
                 "progress": 0,
                 "current_step": 0,
                 "results": {},
-                "estimated_revenue": float(action['revenue'].split('-')[1].replace('$', '')) if '-' in action['revenue'] else 25,
+                "estimated_revenue": estimated_revenue,
                 "phase": phase,
                 "strategy_step": action['step']
             }

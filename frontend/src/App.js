@@ -12,6 +12,9 @@ function App() {
   const [revenueStats, setRevenueStats] = useState(null);
   const [revenueOpportunities, setRevenueOpportunities] = useState([]);
   const [nextActions, setNextActions] = useState([]);
+  const [strategyPlan, setStrategyPlan] = useState(null);
+  const [strategyStatus, setStrategyStatus] = useState(null);
+  const [showStrategyModal, setShowStrategyModal] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showCreateWorkflow, setShowCreateWorkflow] = useState(false);
   const [loading, setLoading] = useState(true);

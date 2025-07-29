@@ -176,6 +176,7 @@ function App() {
       fetchAgentLogs();
       fetchRevenueStats();
       fetchNextActions();
+      fetchStrategyStatus();
     }, 5000);
 
     return () => clearInterval(interval);

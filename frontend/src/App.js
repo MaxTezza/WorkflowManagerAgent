@@ -615,6 +615,75 @@ function App() {
           </div>
         )}
 
+        {activeTab === 'revenue' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold">💰 Revenue Generation Center</h2>
+                <p className="text-gray-600">AI-powered digital product creation for maximum profitability</p>
+              </div>
+            </div>
+
+            {/* Revenue Stats */}
+            {revenueStats && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-6 text-white">
+                  <h3 className="text-lg font-semibold mb-2">Total Revenue Target</h3>
+                  <p className="text-3xl font-bold">${revenueStats.total_revenue_target?.toFixed(2)}</p>
+                </div>
+                <div className="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-6 text-white">
+                  <h3 className="text-lg font-semibold mb-2">Active Revenue Workflows</h3>
+                  <p className="text-3xl font-bold">{revenueStats.active_revenue_workflows}</p>
+                </div>
+                <div className="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-6 text-white">
+                  <h3 className="text-lg font-semibold mb-2">Completed Templates</h3>
+                  <p className="text-3xl font-bold">{revenueStats.revenue_workflows_completed}</p>
+                </div>
+                <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg p-6 text-white">
+                  <h3 className="text-lg font-semibold mb-2">Avg Template Price</h3>
+                  <p className="text-3xl font-bold">${revenueStats.average_template_price?.toFixed(2)}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Next Actions */}
+            {nextActions && nextActions.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                <h3 className="text-lg font-bold text-red-700 mb-4">🚨 Immediate Actions Required</h3>
+                <p className="text-red-600 mb-4">Complete these steps to start earning revenue:</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {nextActions.map((action, idx) => (
+                    <NextActionCard key={idx} action={action} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Revenue Opportunities */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold">🎯 Identified Revenue Opportunities</h3>
+                <p className="text-sm text-gray-600 mt-1">Templates the AI agent found based on trending topics</p>
+              </div>
+              <div className="p-6">
+                {revenueOpportunities.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {revenueOpportunities.map((opportunity, idx) => (
+                      <RevenueOpportunityCard key={idx} opportunity={opportunity} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">AI agent is analyzing market trends to identify profitable template opportunities...</p>
+                    <p className="text-sm text-gray-500 mt-2">Check back in a few minutes for new opportunities</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'trends' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -628,7 +697,29 @@ function App() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trends.map((trend, idx) => (
-                <TrendCard key={idx} trend={trend} />
+                <div key={idx} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-l-green-500">
+                  <h4 className="font-semibold text-gray-800 mb-2">{trend.keyword}</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="text-gray-500">Score:</span>
+                      <span className="ml-2 font-medium">{trend.trend_score?.toFixed(2)}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Volume:</span>
+                      <span className="ml-2 font-medium">{trend.volume}</span>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-gray-500 text-sm">Opportunities:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {trend.product_opportunities?.map((opp, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                          {opp}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

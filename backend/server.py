@@ -1102,8 +1102,282 @@ async def get_next_revenue_actions():
     
     return convert_mongo_doc(next_actions)
 
-@app.get("/api/dashboard/stats")
-async def get_dashboard_stats():
+@app.get("/api/strategy/zero-dollar-plan")
+async def get_zero_dollar_strategy():
+    """Get the complete $0 earnings strategy with actionable steps"""
+    strategy = {
+        "strategy_name": "Zero Dollar Digital Empire",
+        "total_revenue_potential": "$500-2000/month",
+        "time_to_first_sale": "24-48 hours",
+        "investment_required": "$0",
+        "success_probability": "High (85%+)",
+        
+        "phase_1_immediate": {
+            "timeline": "Today (0-8 hours)",
+            "revenue_target": "$50-150",
+            "actions": [
+                {
+                    "step": 1,
+                    "action": "Create Resume Template Bundle",
+                    "tool": "Google Docs (Free)",
+                    "time": "2 hours",
+                    "revenue": "$15-25",
+                    "instructions": [
+                        "Open Google Docs and create 3 professional resume layouts",
+                        "Use fonts: Arial, Calibri, Times New Roman (ATS-friendly)",
+                        "Include: Modern, Creative, and Traditional styles",
+                        "Add matching cover letter template",
+                        "Export as PDF + Word formats"
+                    ]
+                },
+                {
+                    "step": 2,
+                    "action": "List on Etsy",
+                    "tool": "Etsy (Free to list)",
+                    "time": "1 hour",
+                    "revenue": "Immediate sales potential",
+                    "instructions": [
+                        "Create Etsy seller account (free)",
+                        "Upload resume templates with professional photos",
+                        "Price at $12-18 for bundle",
+                        "Use keywords: 'resume template', 'ATS friendly', 'professional'",
+                        "Offer instant download"
+                    ]
+                }
+            ]
+        },
+        
+        "phase_2_scale": {
+            "timeline": "Day 2-7",
+            "revenue_target": "$200-500",
+            "actions": [
+                {
+                    "step": 3,
+                    "action": "Create Social Media Template Pack",
+                    "tool": "Canva (Free account)",
+                    "time": "3 hours",
+                    "revenue": "$20-35",
+                    "instructions": [
+                        "Sign up for free Canva account",
+                        "Create 20+ Instagram story templates",
+                        "Design themes: quotes, product showcases, tips",
+                        "Export as PNG files",
+                        "Create Canva template links for easy editing"
+                    ]
+                },
+                {
+                    "step": 4,
+                    "action": "Business Plan Template",
+                    "tool": "Google Docs + Sheets",
+                    "time": "4 hours", 
+                    "revenue": "$25-45",
+                    "instructions": [
+                        "Create comprehensive business plan template",
+                        "Include: Executive summary, market analysis, financials",
+                        "Add Excel spreadsheet with financial formulas",
+                        "Write step-by-step instructions guide",
+                        "Professional formatting and layout"
+                    ]
+                }
+            ]
+        },
+        
+        "phase_3_automate": {
+            "timeline": "Week 2-4",
+            "revenue_target": "$500-1500",
+            "actions": [
+                {
+                    "step": 5,
+                    "action": "Expand to Multiple Platforms",
+                    "platforms": ["Gumroad", "Creative Market", "Etsy"],
+                    "time": "1 hour per platform",
+                    "revenue": "3x sales volume",
+                    "instructions": [
+                        "Cross-list all templates on Gumroad (higher profit margin)",
+                        "Apply to Creative Market (premium pricing)",
+                        "Optimize SEO for each platform",
+                        "Create platform-specific descriptions"
+                    ]
+                },
+                {
+                    "step": 6,
+                    "action": "Create Niche-Specific Templates",
+                    "niches": ["Real Estate", "Fitness", "E-commerce", "Restaurants"],
+                    "time": "2 hours per niche",
+                    "revenue": "$30-60 per niche",
+                    "instructions": [
+                        "Research high-demand niches",
+                        "Create industry-specific templates",
+                        "Higher pricing for specialized content",
+                        "Target professional keywords"
+                    ]
+                }
+            ]
+        },
+        
+        "tools_stack": {
+            "design": ["Canva (Free)", "GIMP (Free)", "Google Drawings"],
+            "documents": ["Google Docs (Free)", "Google Sheets (Free)", "LibreOffice (Free)"],
+            "marketplaces": ["Etsy (Free listing)", "Gumroad (Free)", "Creative Market (Application)"],
+            "marketing": ["Pinterest (Free)", "Instagram (Free)", "Facebook Groups (Free)"],
+            "analytics": ["Google Analytics (Free)", "Etsy Stats (Built-in)", "Gumroad Analytics"]
+        },
+        
+        "success_metrics": {
+            "week_1": {"templates_created": 3, "listings_published": 5, "target_sales": "$50-100"},
+            "week_2": {"templates_created": 6, "listings_published": 10, "target_sales": "$150-300"},
+            "month_1": {"templates_created": 15, "listings_published": 25, "target_sales": "$500-1000"},
+            "month_3": {"templates_created": 40, "listings_published": 60, "target_sales": "$1500-3000"}
+        },
+        
+        "automation_triggers": [
+            "AI agent monitors trending topics daily",
+            "Auto-creates templates based on market demand", 
+            "Optimizes pricing based on competitor analysis",
+            "Schedules content creation during high-demand periods",
+            "Tracks performance and adjusts strategy"
+        ],
+        
+        "risk_mitigation": {
+            "low_sales": "Create more niche-specific templates, improve SEO",
+            "competition": "Focus on unique designs and bundle offerings",
+            "platform_changes": "Diversify across multiple marketplaces",
+            "content_issues": "Use only free commercial-use resources"
+        }
+    }
+    
+    return strategy
+
+@app.post("/api/strategy/execute-phase")
+async def execute_strategy_phase(phase_data: dict):
+    """Execute a specific phase of the $0 strategy"""
+    phase = phase_data.get('phase', 'phase_1_immediate')
+    
+    try:
+        # Create workflows for the specified phase
+        strategy = await get_zero_dollar_strategy()
+        phase_info = strategy.get(phase, {})
+        
+        workflows_created = []
+        
+        for action in phase_info.get('actions', []):
+            workflow_data = {
+                "id": str(uuid.uuid4()),
+                "name": f"💰 {action['action']} - ${action['revenue']} Target",
+                "description": f"Execute {action['action']} using {action['tool']} in {action['time']}",
+                "type": "revenue_generation",
+                "category": "digital_templates",
+                "steps": [
+                    {
+                        "type": "market_research",
+                        "name": f"Research {action['action']} market",
+                        "duration": 20,
+                        "instructions": action.get('instructions', [])[:2]
+                    },
+                    {
+                        "type": "template_creation", 
+                        "name": f"Create {action['action']}",
+                        "duration": int(action['time'].split()[0]) * 60 if 'hour' in action['time'] else 90,
+                        "instructions": action.get('instructions', [])[2:]
+                    },
+                    {
+                        "type": "listing_creation",
+                        "name": f"List {action['action']} on marketplaces",
+                        "duration": 30,
+                        "instructions": ["Create optimized listings", "Set competitive pricing", "Enable instant download"]
+                    }
+                ],
+                "status": "pending",
+                "priority": 4,
+                "target_profitability": float(action['revenue'].split('-')[0].replace('$', '')) * 0.9,
+                "actual_profitability": 0.0,
+                "created_at": datetime.now(),
+                "started_at": None,
+                "completed_at": None,
+                "progress": 0,
+                "current_step": 0,
+                "results": {},
+                "estimated_revenue": float(action['revenue'].split('-')[1].replace('$', '')) if '-' in action['revenue'] else 25,
+                "phase": phase,
+                "strategy_step": action['step']
+            }
+            
+            await workflows_collection.insert_one(workflow_data)
+            workflows_created.append(workflow_data['id'])
+            
+            # Log strategy execution
+            await agent_logs_collection.insert_one({
+                "id": str(uuid.uuid4()),
+                "timestamp": datetime.now(),
+                "action": f"🎯 STRATEGY EXECUTION: Created workflow for {action['action']}",
+                "phase": phase,
+                "revenue_target": workflow_data['estimated_revenue'],
+                "workflow_id": workflow_data['id'],
+                "reasoning": f"Executing ${action['revenue']} revenue opportunity with {action['tool']}"
+            })
+        
+        return {
+            "message": f"Strategy phase {phase} executed successfully",
+            "workflows_created": len(workflows_created),
+            "workflow_ids": workflows_created,
+            "expected_revenue": phase_info.get('revenue_target', '$0'),
+            "timeline": phase_info.get('timeline', 'Unknown')
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/strategy/current-status")
+async def get_strategy_status():
+    """Get current status of the $0 strategy execution"""
+    try:
+        # Get all strategy workflows
+        strategy_workflows = await workflows_collection.find({
+            "category": "digital_templates",
+            "phase": {"$exists": True}
+        }).to_list(None)
+        
+        status = {
+            "total_strategy_workflows": len(strategy_workflows),
+            "phases_status": {},
+            "total_completed": 0,
+            "total_revenue_generated": 0,
+            "next_recommended_phase": "phase_1_immediate"
+        }
+        
+        # Analyze by phase
+        for phase in ["phase_1_immediate", "phase_2_scale", "phase_3_automate"]:
+            phase_workflows = [w for w in strategy_workflows if w.get('phase') == phase]
+            completed = [w for w in phase_workflows if w.get('status') == 'completed']
+            
+            status["phases_status"][phase] = {
+                "total_workflows": len(phase_workflows),
+                "completed": len(completed),
+                "in_progress": len([w for w in phase_workflows if w.get('status') == 'running']),
+                "pending": len([w for w in phase_workflows if w.get('status') == 'pending']),
+                "revenue_generated": sum(w.get('estimated_revenue', 0) for w in completed),
+                "completion_rate": round((len(completed) / len(phase_workflows)) * 100, 1) if phase_workflows else 0
+            }
+        
+        # Determine next recommended phase
+        phase_1_complete = status["phases_status"].get("phase_1_immediate", {}).get("completion_rate", 0) >= 80
+        phase_2_complete = status["phases_status"].get("phase_2_scale", {}).get("completion_rate", 0) >= 80
+        
+        if not phase_1_complete:
+            status["next_recommended_phase"] = "phase_1_immediate"
+        elif not phase_2_complete:
+            status["next_recommended_phase"] = "phase_2_scale"
+        else:
+            status["next_recommended_phase"] = "phase_3_automate"
+        
+        # Calculate totals
+        status["total_completed"] = sum(phase.get("completed", 0) for phase in status["phases_status"].values())
+        status["total_revenue_generated"] = sum(phase.get("revenue_generated", 0) for phase in status["phases_status"].values())
+        
+        return status
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     total_workflows = await workflows_collection.count_documents({})
     active_workflows = await workflows_collection.count_documents({"status": "running"})
     completed_workflows = await workflows_collection.count_documents({"status": "completed"})

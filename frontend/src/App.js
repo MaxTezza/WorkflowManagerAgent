@@ -476,7 +476,7 @@ function App() {
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex space-x-8">
-            {['dashboard', 'workflows', 'revenue', 'trends', 'logs'].map((tab) => (
+            {['dashboard', 'strategy', 'workflows', 'revenue', 'trends', 'logs'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -486,7 +486,8 @@ function App() {
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab === 'revenue' ? '💰 Revenue' : tab}
+                {tab === 'revenue' ? '💰 Revenue' : 
+                 tab === 'strategy' ? '🎯 $0 Strategy' : tab}
               </button>
             ))}
           </div>

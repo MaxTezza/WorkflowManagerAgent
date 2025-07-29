@@ -159,7 +159,9 @@ function App() {
         fetchAgentLogs(),
         fetchRevenueStats(),
         fetchRevenueOpportunities(),
-        fetchNextActions()
+        fetchNextActions(),
+        fetchStrategyPlan(),
+        fetchStrategyStatus()
       ]);
       setLoading(false);
     };
